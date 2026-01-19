@@ -1,34 +1,13 @@
 <script setup>
-import { ref, onMounted, useTemplateRef, nextTick } from 'vue'
-import useMarvelService from '@/composables/MarvelService'
+import { onMounted, useTemplateRef } from 'vue'
 import Spinner from '@/components/common/BaseSpinner.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
+import { useCharactersStore } from '@/stores/characters'
 
-const selectedChar = defineModel()
-const characters = ref([])
-const newItemLoading = ref(false)
-const offset = ref(0)
-const charEnded = ref(false)
+
 const charItmesRefs = useTemplateRef('charItmes')
-const { loading, error, getAllCharacters } = useMarvelService()
 
-const onRequest = (offset) => {
-  getAllCharacters(offset).then(onCharListLoaded)
-}
-
-const onCharListLoaded = (newCharList) => {
-  let ended = false
-  if (newCharList.length < 9) {
-    ended = true
-  }
-  characters.value = [...characters.value, ...newCharList]
-  newItemLoading.value = false
-  offset.value += 9
-  charEnded.value = ended
-  nextTick(() => {
-    focusOnItem(0)
-  })
-}
+const store = useCharactersStore()
 
 const focusOnItem = (id) => {
   charItmesRefs.value.forEach((el) => {
@@ -38,21 +17,25 @@ const focusOnItem = (id) => {
 }
 
 const onCharSelected = (id) => {
-  selectedChar.value = id
+ store.selectCharacter(id)
 }
+
 onMounted(() => {
-  onRequest(offset.value)
+if (store.characters.length === 0) {
+    store.loadCharacters()
+  }
 })
+
 </script>
 
 <template>
   <div class="char__list">
-    <Spinner v-if="loading" />
-    <ErrorMessage v-if="error" />
+    <Spinner v-if="store.newItemLoading" />
+    <ErrorMessage v-if="store.error" />
     <ul class="char__grid">
       <li
         class="char__item"
-        v-for="(char, index) in characters"
+        v-for="(char, index) in store.characters"
         :key="char.id"
         ref="charItmes"
         @click="(focusOnItem(index), onCharSelected(char.id))"
@@ -69,9 +52,9 @@ onMounted(() => {
     </ul>
     <button
       class="button button__main button__long"
-      @click="onRequest(offset)"
-      :disabled="newItemLoading"
-      v-if="!charEnded"
+      @click="store.loadCharacters()"
+      :disabled="store.newItemLoading"
+      v-if="!store.charEnded"
     >
       <div class="inner">load more</div>
     </button>

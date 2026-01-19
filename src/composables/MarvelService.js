@@ -16,7 +16,6 @@ export default function MarvelService() {
 
   const getAllCharacters = async (offset = _baseOffset) => {
     const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&apikey=${_apiKey}`)
-    console.log(res)
     return res.data.results.map(_transformCharacter)
   }
 

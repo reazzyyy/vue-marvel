@@ -1,69 +1,44 @@
 <script setup>
-import useMarvelService from '@/composables/MarvelService'
 import Skeleton from '@/components/common/BaseSkeleton.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import Spinner from '@/components/common/BaseSpinner.vue'
-import { ref, watch } from 'vue'
-const char = ref(null)
+import { useCharactersStore } from '@/stores/characters'
+import { storeToRefs } from 'pinia'
+const store = useCharactersStore()
 
-const props = defineProps({
-  charId: {
-    type: Number,
-    required: false,
-  },
-})
 
-const { loading, error, clearServiceError, getCharacter } = useMarvelService()
+const { selectedCharacter, charInfoLoading, error } = storeToRefs(store)
+console.log(selectedCharacter);
 
-const onCharLoaded = (loadedChar) => {
-  char.value = loadedChar
-}
-
-const updateChar = () => {
-  console.log(props.charId)
-  if (!props.charId) {
-    return
-  }
-  clearServiceError()
-  getCharacter(props.charId).then(onCharLoaded)
-}
-
-watch(props, (newVal) => {
-  console.log(newVal)
-  if (!newVal) {
-    return
-  }
-  updateChar()
-})
 </script>
 
 <template>
   <div class="char__info">
-    <Skeleton v-if="!(char || loading || error)" />
+    <Skeleton v-if="!(selectedCharacter || charInfoLoading || error)" />
     <ErrorMessage v-if="error" />
-    <Spinner v-if="loading" />
+    <Spinner v-if="charInfoLoading" />
 
-    <template v-if="!(loading || error || !char)">
+    <template v-if="!(loading || error || !selectedCharacter)">
       <div class="char__basics">
-        <img :src="char.thumbnail" :alt="char.name" />
+        <img :src="selectedCharacter.thumbnail" :alt="selectedCharacter.name" />
         <div>
-          <div class="char__info-name">{{ char.name }}</div>
+          <div class="char__info-name">{{ selectedCharacter.name }}</div>
           <div class="char__btns">
-            <a :href="char.homepage" class="button button__main">
+            <a :href="selectedCharacter.homepage" class="button button__main">
               <div class="inner">homepage</div>
             </a>
-            <a :href="char.wiki" class="button button__secondary">
+            <a :href="selectedCharacter.wiki" class="button button__secondary">
               <div class="inner">Wiki</div>
             </a>
           </div>
         </div>
       </div>
       <div class="char__descr">
-        {{ char.description }}
+        {{ selectedCharacter.description }}
       </div>
       <div class="char__comics">Comics:</div>
       <ul class="char__comics-list">
-        <li class="char__comics-item" v-for="comic in char.comics" :key="comic.id">
+        <li class="char__comics-item" v-for="comic in selectedCharacter.comics" :key="comic.id">
           {{ comic }}
         </li>
       </ul>
