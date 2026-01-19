@@ -33,8 +33,8 @@ watch(
 </script>
 
 <template>
-  <Spinner v-if="loading" />
-  <ErrorMessage v-if="error" />
+  <component :is="loading && Spinner"></component>
+  <component :is="error && ErrorMessage"></component>
   <div v-if="singleComic" class="single-comic">
     <img :src="singleComic.thumbnail" :alt="singleComic.title" class="single-comic__img" />
     <div class="single-comic__info">

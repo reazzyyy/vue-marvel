@@ -14,11 +14,11 @@ console.log(selectedCharacter);
 
 <template>
   <div class="char__info">
-    <Skeleton v-if="!(selectedCharacter || charInfoLoading || error)" />
-    <ErrorMessage v-if="error" />
-    <Spinner v-if="charInfoLoading" />
+    <component :is="!(selectedCharacter || charInfoLoading || error) && Skeleton"></component>
+    <component :is="error && ErrorMessage"></component>
+    <component :is="charInfoLoading && Spinner"></component>
 
-    <template v-if="!(loading || error || !selectedCharacter)">
+    <template v-if="!(charInfoLoading || error || !selectedCharacter)">
       <div class="char__basics">
         <img :src="selectedCharacter.thumbnail" :alt="selectedCharacter.name" />
         <div>

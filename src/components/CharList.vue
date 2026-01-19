@@ -30,8 +30,8 @@ if (store.characters.length === 0) {
 
 <template>
   <div class="char__list">
-    <Spinner v-if="store.newItemLoading" />
-    <ErrorMessage v-if="store.error" />
+    <component :is="store.newItemLoading && Spinner"></component>
+    <component :is="store.error && ErrorMessage"></component>
     <ul class="char__grid">
       <li
         class="char__item"

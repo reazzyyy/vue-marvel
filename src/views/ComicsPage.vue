@@ -31,8 +31,8 @@ onMounted(() => {
 
 <template>
   <div class="comics__list">
-    <Spinner v-if="loading" />
-    <ErrorMessage v-if="error" />
+    <component :is="loading && Spinner"></component>
+    <component :is="error && ErrorMessage"></component>
     <ul class="comics__grid">
       <li class="comics__item" v-for="comic in comicsList" :key="comic.id">
         <router-link :to="`/comics/${comic.id}`">
